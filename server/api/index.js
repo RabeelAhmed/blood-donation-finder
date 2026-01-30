@@ -1,7 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const connectDB = require('./config/db');
+const connectDB = require('../config/db');
 
 dotenv.config();
 
@@ -14,10 +14,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Routes
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/users', require('./routes/userRoutes'));
-app.use('/api/requests', require('./routes/requestRoutes'));
-app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/auth', require('../routes/authRoutes'));
+app.use('/api/users', require('../routes/userRoutes'));
+app.use('/api/requests', require('../routes/requestRoutes'));
+app.use('/api/admin', require('../routes/adminRoutes'));
 
 app.get("/", (req, res) => {
   res.send("Blood Donation Finder API is running 🚀");
