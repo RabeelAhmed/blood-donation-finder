@@ -37,7 +37,7 @@ A full-stack MERN application designed to connect blood donors with patients in 
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/blood-donation-finder.git
+git clone https://github.com/RabeelAhmed/blood-donation-finder.git
 cd blood-donation-finder
 ```
 
