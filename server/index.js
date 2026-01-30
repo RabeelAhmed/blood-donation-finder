@@ -19,9 +19,10 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/requests', require('./routes/requestRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 
-app.get('/', (req, res) => {
-  res.send('Blood Donation API is running');
+app.get("/", (req, res) => {
+  res.send("Blood Donation Finder API is running 🚀");
 });
+
 
 // Error Handler
 app.use((err, req, res, next) => {
