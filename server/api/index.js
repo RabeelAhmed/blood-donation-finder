@@ -17,8 +17,11 @@ app.use(cors({
 // Handle preflight requests
 app.options('*', cors());
 
-// Middleware to ensure DB connection
+// Middleware to ensure DB connection (skipped for preflight)
 app.use(async (req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
   try {
     await connectDB();
     next();
