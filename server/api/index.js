@@ -7,19 +7,19 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Connect DB ONCE
-connectDB();
-
 // ✅ CORS config
 app.use(cors({
   origin: ["https://donor-finder.netlify.app", "http://localhost:5173"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
 
 // ✅ Handle preflight
 app.options("*", cors());
+
+// ✅ Connect DB ONCE
+connectDB();
 
 // ✅ Body parser
 app.use(express.json());
