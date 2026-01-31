@@ -1,75 +1,51 @@
-const express = require('express');
-const dotenv = require('dotenv');
-const cors = require('cors');
-const connectDB = require('../config/db');
+const express = require("express");
+const dotenv = require("dotenv");
+const cors = require("cors");
+const connectDB = require("../config/db");
 
 dotenv.config();
 
 const app = express();
 
+// ✅ Connect DB ONCE
+connectDB();
+
+// ✅ CORS config
 app.use(cors({
   origin: ["https://donor-finder.netlify.app", "http://localhost:5173"],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"]
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
 }));
 
-// Handle preflight requests
-app.options('*', cors());
+// ✅ Handle preflight
+app.options("*", cors());
 
-// Middleware to ensure DB connection (skipped for preflight)
-app.use(async (req, res, next) => {
-  if (req.method === 'OPTIONS') {
-    return next();
-  }
-  try {
-    await connectDB();
-    next();
-  } catch (error) {
-    res.status(500).json({ message: 'Database connection failed', error: error.message });
-  }
-});
-
+// ✅ Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Routes
-const authRoutes = require('../routes/authRoutes');
-const userRoutes = require('../routes/userRoutes');
-const requestRoutes = require('../routes/requestRoutes');
-const adminRoutes = require('../routes/adminRoutes');
+const authRoutes = require("../routes/authRoutes");
+const userRoutes = require("../routes/userRoutes");
+const requestRoutes = require("../routes/requestRoutes");
+const adminRoutes = require("../routes/adminRoutes");
 
-// Support both /api/auth and /auth
-app.use('/api/auth', authRoutes);
-app.use('/auth', authRoutes);
-
-app.use('/api/users', userRoutes);
-app.use('/users', userRoutes);
-
-app.use('/api/requests', requestRoutes);
-app.use('/requests', requestRoutes);
-
-app.use('/api/admin', adminRoutes);
-app.use('/admin', adminRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/requests", requestRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.get("/", (req, res) => {
   res.send("Blood Donation Finder API is running 🚀");
 });
 
-
-// Error Handler
+// Error handler
 app.use((err, req, res, next) => {
-  const statusCode = res.statusCode ? res.statusCode : 500;
-  res.status(statusCode);
-  res.json({
+  res.status(res.statusCode || 500).json({
     message: err.message,
-    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+    stack: process.env.NODE_ENV === "production" ? null : err.stack
   });
 });
-
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-}
 
 module.exports = app;
