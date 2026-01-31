@@ -17,7 +17,15 @@ app.use(async (req, res, next) => {
   }
 });
 
-app.use(cors());
+app.use(cors({
+  origin: ["https://donor-finder.netlify.app", "http://localhost:5173"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+// Handle preflight requests
+app.options('*', cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
