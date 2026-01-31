@@ -10,7 +10,7 @@ const connectDB = async () => {
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`Error: ${error.message}`);
-    // Don't exit process in serverless
+    throw error; // Re-throw so middleware catches it
   }
 };
 
