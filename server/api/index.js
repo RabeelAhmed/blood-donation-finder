@@ -14,10 +14,23 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Routes
-app.use('/api/auth', require('../routes/authRoutes'));
-app.use('/api/users', require('../routes/userRoutes'));
-app.use('/api/requests', require('../routes/requestRoutes'));
-app.use('/api/admin', require('../routes/adminRoutes'));
+const authRoutes = require('../routes/authRoutes');
+const userRoutes = require('../routes/userRoutes');
+const requestRoutes = require('../routes/requestRoutes');
+const adminRoutes = require('../routes/adminRoutes');
+
+// Support both /api/auth and /auth
+app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
+
+app.use('/api/users', userRoutes);
+app.use('/users', userRoutes);
+
+app.use('/api/requests', requestRoutes);
+app.use('/requests', requestRoutes);
+
+app.use('/api/admin', adminRoutes);
+app.use('/admin', adminRoutes);
 
 app.get("/", (req, res) => {
   res.send("Blood Donation Finder API is running 🚀");

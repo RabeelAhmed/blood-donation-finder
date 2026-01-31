@@ -1,7 +1,13 @@
 import axios from 'axios';
 
 // Ensure baseURL ends with /api/ for consistent joining
-const rawBaseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+let rawBaseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+// Resilience: If it's a vercel URL and missing /api, add it
+if (rawBaseURL.includes('vercel.app') && !rawBaseURL.includes('/api')) {
+    rawBaseURL = rawBaseURL.endsWith('/') ? `${rawBaseURL}api` : `${rawBaseURL}/api`;
+}
+
 const baseURL = rawBaseURL.endsWith('/') ? rawBaseURL : `${rawBaseURL}/`;
 
 const api = axios.create({
