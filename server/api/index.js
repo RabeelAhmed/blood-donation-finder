@@ -7,6 +7,16 @@ dotenv.config();
 
 const app = express();
 
+app.use(cors({
+  origin: ["https://donor-finder.netlify.app", "http://localhost:5173"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+// Handle preflight requests
+app.options('*', cors());
+
 // Middleware to ensure DB connection
 app.use(async (req, res, next) => {
   try {
@@ -17,15 +27,6 @@ app.use(async (req, res, next) => {
   }
 });
 
-app.use(cors({
-  origin: ["https://donor-finder.netlify.app", "http://localhost:5173"],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
-
-// Handle preflight requests
-app.options('*', cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
