@@ -176,6 +176,7 @@ const toggleFavorite = async (req, res) => {
 // @route   DELETE /api/users/:id
 // @access  Private/Admin
 const deleteUser = async (req, res) => {
+  console.log(`[${new Date().toISOString()}] DELETE USER REQUEST: ID = ${req.params.id}`);
   try {
     const user = await User.findById(req.params.id);
 
