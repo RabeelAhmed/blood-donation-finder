@@ -7,9 +7,21 @@ dotenv.config();
 
 const app = express();
 
+// ✅ Connect DB (Avoid blocking initialization)
+connectDB().catch(err => console.error("Database connection failed:", err.message));
+
 // ✅ CORS config
+const allowedOrigins = ["https://donor-finder.netlify.app", "http://localhost:5173"];
 app.use(cors({
-  origin: ["https://donor-finder.netlify.app", "http://localhost:5173"],
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
@@ -17,9 +29,6 @@ app.use(cors({
 
 // ✅ Handle preflight
 app.options("*", cors());
-
-// ✅ Connect DB ONCE
-connectDB();
 
 // ✅ Body parser
 app.use(express.json());
