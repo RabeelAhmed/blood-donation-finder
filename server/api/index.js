@@ -70,6 +70,15 @@ app.get("/", (req, res) => {
   res.send("Blood Donation Finder API is running 🚀");
 });
 
+// ✅ Catch-all for undefined routes
+app.use((req, res) => {
+  console.log(`[${new Date().toISOString()}] 404 - NOT FOUND: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({ 
+    message: `Route not found: ${req.method} ${req.originalUrl}`,
+    tip: "Check your route definitions in api/index.js"
+  });
+});
+
 // Error handler
 app.use((err, req, res, next) => {
   console.error("SERVER ERROR:", err);
