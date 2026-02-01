@@ -219,9 +219,21 @@ const Dashboard = () => {
 
           {/* Results Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {donors.map((donor) => (
-              <DonorCard key={donor._id} donor={donor} onRequest={setSelectedDonor} />
-            ))}
+            {donors.map((donor) => {
+              // Find if there's an existing request for this donor
+              const request = myRequests.find(r => 
+                (r.donorId?._id === donor._id) || (r.donorId === donor._id)
+              );
+              
+              return (
+                <DonorCard 
+                  key={donor._id} 
+                  donor={donor} 
+                  onRequest={setSelectedDonor} 
+                  requestStatus={request?.status}
+                />
+              );
+            })}
           </div>
           
            {/* My Requests Status */}

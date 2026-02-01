@@ -4,7 +4,7 @@ import { useState } from 'react';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
 
-const DonorCard = ({ donor, onRequest }) => {
+const DonorCard = ({ donor, onRequest, requestStatus }) => {
   const { user, updateUser } = useAuth();
   const [isFavorite, setIsFavorite] = useState(user?.favorites?.includes(donor._id));
 
@@ -68,23 +68,51 @@ const DonorCard = ({ donor, onRequest }) => {
       </div>
       
       <div className="mt-5 border-t border-gray-100 dark:border-gray-800 pt-4">
-        <div className="grid grid-cols-2 gap-3 mb-3">
-             <a href={`tel:${donor.phone}`} className="btn-secondary flex justify-center items-center text-xs py-2.5 font-bold shadow-sm">
-                 <Phone className="mr-2 h-3.5 w-3.5" /> Call
-             </a>
-             <a href={`https://wa.me/${donor.phone}`} target="_blank" rel="noopener noreferrer" className="btn-secondary flex justify-center items-center text-xs py-2.5 text-green-600 dark:text-green-400 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900/20 border-green-100 dark:border-green-900 shadow-sm font-bold">
-                 <MessageCircle className="mr-2 h-3.5 w-3.5" /> WhatsApp
-             </a>
-        </div>
-        
-        <button
-          type="button"
-          onClick={() => onRequest(donor)}
-          className="w-full btn-primary flex justify-center items-center text-sm py-3 font-bold shadow-lg"
-        >
-          <Droplet className="mr-2 h-4.5 w-4.5" />
-          Request Blood Now
-        </button>
+        {requestStatus === 'accepted' ? (
+           <>
+             <div className="grid grid-cols-2 gap-3 mb-3">
+                  <a href={`tel:${donor.phone}`} className="btn-secondary flex justify-center items-center text-xs py-2.5 font-bold shadow-sm">
+                      <Phone className="mr-2 h-3.5 w-3.5" /> Call
+                  </a>
+                  <a href={`https://wa.me/${donor.phone}`} target="_blank" rel="noopener noreferrer" className="btn-secondary flex justify-center items-center text-xs py-2.5 text-green-600 dark:text-green-400 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900/20 border-green-100 dark:border-green-900 shadow-sm font-bold">
+                      <MessageCircle className="mr-2 h-3.5 w-3.5" /> WhatsApp
+                  </a>
+             </div>
+             <button
+               type="button"
+               disabled
+               className="w-full bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400 border border-green-100 dark:border-green-800 flex justify-center items-center text-sm py-3 font-bold rounded-lg"
+             >
+               Request Accepted
+             </button>
+           </>
+        ) : (
+          <button
+            type="button"
+            onClick={() => !requestStatus && onRequest(donor)}
+            disabled={requestStatus === 'pending' || requestStatus === 'rejected'}
+            className={`w-full flex justify-center items-center text-sm py-3 font-bold rounded-lg shadow-lg transition-all
+              ${!requestStatus 
+                ? 'btn-primary' 
+                : requestStatus === 'pending'
+                ? 'bg-yellow-100 text-yellow-700 border border-yellow-200 cursor-not-allowed shadow-none'
+                : 'bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed shadow-none'}`}
+          >
+            {requestStatus === 'pending' ? (
+               <>
+                 <Clock className="mr-2 h-4.5 w-4.5" />
+                 Request Sent (Pending)
+               </>
+            ) : requestStatus === 'rejected' ? (
+               'Request Rejected'
+            ) : (
+              <>
+                <Droplet className="mr-2 h-4.5 w-4.5" />
+                Request Blood Now
+              </>
+            )}
+          </button>
+        )}
       </div>
     </div>
   );
