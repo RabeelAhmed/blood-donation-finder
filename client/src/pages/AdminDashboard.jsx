@@ -185,7 +185,7 @@ const AdminDashboard = () => {
                         <div className="absolute -left-[5px] top-0 h-2 w-2 rounded-full bg-primary-500"></div>
                         <div className="flex justify-between items-start mb-1">
                             <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight">
-                                {req.patientId?.name || 'Deleted User'} requested {req.bloodGroup}
+                                {(req.patientId?.name || 'Deleted User')} requested {req.bloodGroup}
                             </p>
                             <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase
                                 ${req.status === 'accepted' ? 'text-green-600 bg-green-50' : 
