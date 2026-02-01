@@ -10,6 +10,8 @@ import toast from 'react-hot-toast';
 const Dashboard = () => {
   const { user, updateProfile } = useAuth();
   
+  if (!user) return null;
+  
   // Patient State
   const [donors, setDonors] = useState([]);
   const [searchCity, setSearchCity] = useState('');
@@ -51,27 +53,45 @@ const Dashboard = () => {
               favorites: showFavorites ? 'true' : null
           }
       });
-      setDonors(data);
+      if (Array.isArray(data)) {
+        setDonors(data);
+      } else {
+        console.error('Expected donors array, got:', data);
+        setDonors([]);
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Fetch donors error:', error);
+      setDonors([]);
     }
   };
 
   const fetchMyRequests = async () => {
       try {
           const { data } = await api.get('/requests');
-          setMyRequests(data);
+          if (Array.isArray(data)) {
+            setMyRequests(data);
+          } else {
+            console.error('Expected requests array, got:', data);
+            setMyRequests([]);
+          }
       } catch (error) {
-          console.error(error);
+          console.error('Fetch my requests error:', error);
+          setMyRequests([]);
       }
   }
 
   const fetchIncomingRequests = async () => {
       try {
-           const { data } = await api.get('/requests'); // The endpoint filters by role automatically
-           setRequests(data);
+           const { data } = await api.get('/requests'); 
+           if (Array.isArray(data)) {
+             setRequests(data);
+           } else {
+             console.error('Expected incoming requests array, got:', data);
+             setRequests([]);
+           }
       } catch (error) {
-           console.error(error);
+           console.error('Fetch incoming requests error:', error);
+           setRequests([]);
       }
   }
 
@@ -114,13 +134,20 @@ const Dashboard = () => {
   };
 
   const calculateEligibility = () => {
-    if (!donationHistory || donationHistory.length === 0) return { eligible: true, text: 'You are eligible to donate now.' };
+    if (!donationHistory || !Array.isArray(donationHistory) || donationHistory.length === 0) {
+      return { eligible: true, text: 'You are eligible to donate now.' };
+    }
     
-    // Sort history to find actual last date
+    // Create copy before sorting to avoid mutation during render
     const sortedHistory = [...donationHistory].sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    if (!sortedHistory[0]?.date) {
+      return { eligible: true, text: 'You are eligible to donate now.' };
+    }
+
     const lastDate = new Date(sortedHistory[0].date);
     const nextDate = new Date(lastDate);
-    nextDate.setDate(lastDate.getDate() + 90); // 90 days rule
+    nextDate.setDate(lastDate.getDate() + 90); 
 
     const today = new Date();
     const diffTime = nextDate - today;
@@ -131,12 +158,12 @@ const Dashboard = () => {
     } else {
         return { 
             eligible: false, 
-            text: `You will be eligible in ${diffDays} days (${nextDate.toLocaleDateString()}).` 
+            text: `You will be eligible in ${diffDays} day${diffDays === 1 ? '' : 's'} (${nextDate.toLocaleDateString()}).` 
         };
     }
   };
 
-  const eligibility = calculateEligibility();
+  const eligibility = user.role === 'donor' ? calculateEligibility() : { eligible: true, text: '' };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -219,9 +246,10 @@ const Dashboard = () => {
 
           {/* Results Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {donors.map((donor) => {
+            {(donors || []).map((donor) => {
+              if (!donor) return null;
               // Find if there's an existing request for this donor
-              const request = myRequests.find(r => 
+              const request = (myRequests || []).find(r => 
                 (r.donorId?._id === donor._id) || (r.donorId === donor._id)
               );
               
@@ -252,23 +280,23 @@ const Dashboard = () => {
                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</th>
                            </tr>
                        </thead>
-                       <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                           {myRequests.map((req) => (
-                               <tr key={req._id}>
-                                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{req.donorId?.name}</td>
-                                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{req.bloodGroup}</td>
-                                   <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            ${req.status === 'accepted' ? 'bg-green-100 text-green-800' : 
-                                              req.status === 'rejected' ? 'bg-red-100 text-red-800' : 
-                                              'bg-yellow-100 text-yellow-800'}`}>
-                                            {req.status}
-                                        </span>
-                                   </td>
-                                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{new Date(req.createdAt).toLocaleDateString()}</td>
-                               </tr>
-                           ))}
-                       </tbody>
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            {(myRequests || []).map((req) => (
+                                <tr key={req._id}>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{req.patientId?.name || user.name}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{req.bloodGroup}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                             ${req.status === 'accepted' ? 'bg-green-100 text-green-800' : 
+                                               req.status === 'rejected' ? 'bg-red-100 text-red-800' : 
+                                               'bg-yellow-100 text-yellow-800'}`}>
+                                             {req.status}
+                                         </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{req.createdAt ? new Date(req.createdAt).toLocaleDateString() : 'N/A'}</td>
+                                </tr>
+                            ))}
+                        </tbody>
                    </table>
                    {myRequests.length === 0 && <p className="text-center py-4 text-gray-500 dark:text-gray-400">No requests sent yet.</p>}
                </div>
@@ -368,18 +396,18 @@ const Dashboard = () => {
                 )}
 
                  <div className="overflow-x-auto -mx-6 px-6">
-                   {donationHistory.length > 0 ? (
+                   {(donationHistory || []).length > 0 ? (
                        <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-                           {donationHistory.sort((a,b) => new Date(b.date) - new Date(a.date)).map((record, index) => (
+                           {[...(donationHistory || [])].sort((a,b) => new Date(b.date) - new Date(a.date)).map((record, index) => (
                                <li key={index} className="py-4">
-                                   <div className="flex justify-between">
+                                   <div className="flex justify-between gap-4">
                                        <div>
                                            <p className="text-sm font-medium text-gray-900 dark:text-white">{record.location}</p>
                                            {record.notes && <p className="text-sm text-gray-500 dark:text-gray-400">{record.notes}</p>}
                                        </div>
-                                       <div className="text-right">
-                                           <p className="text-sm text-gray-900 dark:text-gray-100">{new Date(record.date).toLocaleDateString()}</p>
-                                           <p className="text-xs text-gray-500 dark:text-gray-500">Donation</p>
+                                       <div className="text-right flex-shrink-0">
+                                           <p className="text-sm text-gray-900 dark:text-gray-100">{record.date ? new Date(record.date).toLocaleDateString() : 'N/A'}</p>
+                                           <p className="text-xs text-gray-500">Donation</p>
                                        </div>
                                    </div>
                                </li>
@@ -394,44 +422,44 @@ const Dashboard = () => {
             {/* Incoming Requests */}
             <div className="card">
                <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Incoming Requests</h2>
-               <div className="space-y-4">
-                   {requests.map((req) => (
+                <div className="space-y-4">
+                   {(requests || []).map((req) => (
                        <div key={req._id} className="border border-gray-100 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                           <div className="flex justify-between items-start">
-                               <div>
-                                   <h3 className="font-medium text-gray-900 dark:text-white">Request from {req.patientId?.name}</h3>
+                           <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                               <div className="w-full">
+                                   <h3 className="font-medium text-gray-900 dark:text-white">Request from {req.patientId?.name || 'Patient'}</h3>
                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Needed: {req.bloodGroup}</p>
-                                   <div className="mt-2 text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 p-2 rounded">
+                                   <div className="mt-2 text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-100 dark:border-gray-600">
                                        "{req.message}"
                                    </div>
                                </div>
-                               <div className="flex flex-col items-end space-y-2">
-                                   <span className="text-xs text-gray-400">{new Date(req.createdAt).toLocaleDateString()}</span>
+                               <div className="flex flex-col items-end space-y-3 flex-shrink-0 w-full sm:w-auto">
+                                   <span className="text-xs text-gray-400">{req.createdAt ? new Date(req.createdAt).toLocaleDateString() : 'N/A'}</span>
                                    
                                    {req.status === 'pending' ? (
-                                       <div className="flex space-x-2">
+                                       <div className="flex space-x-2 w-full sm:w-auto">
                                            <button 
                                             onClick={() => handleRequestAction(req._id, 'accepted')}
-                                            className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700">
+                                            className="flex-1 sm:flex-none px-4 py-2 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-700 shadow-sm transition-colors">
                                             Accept
                                            </button>
                                            <button 
                                             onClick={() => handleRequestAction(req._id, 'rejected')}
-                                            className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700">
+                                            className="flex-1 sm:flex-none px-4 py-2 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700 shadow-sm transition-colors">
                                             Reject
                                            </button>
                                        </div>
                                    ) : (
-                                       <span className={`px-2 py-1 text-xs rounded-full font-medium
+                                       <span className={`px-3 py-1 text-xs rounded-full font-bold uppercase tracking-wider
                                             ${req.status === 'accepted' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                            {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
+                                            {req.status}
                                        </span>
                                    )}
                                </div>
                            </div>
                        </div>
                    ))}
-                   {requests.length === 0 && <p className="text-center py-8 text-gray-500">No requests yet.</p>}
+                   {(requests || []).length === 0 && <p className="text-center py-12 text-gray-400 text-sm">No incoming requests yet.</p>}
                </div>
             </div>
         </div>
