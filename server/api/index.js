@@ -20,7 +20,7 @@ app.use(cors({
 }));
 
 // ✅ Handle preflight
-app.options("(.*)", (req, res) => {
+app.options("/:any*", (req, res) => {
   res.status(200).end();
 });
 
