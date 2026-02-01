@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import DonorCard from '../components/DonorCard';
 import RequestModal from '../components/RequestModal';
@@ -9,8 +10,16 @@ import toast from 'react-hot-toast';
 
 const Dashboard = () => {
   const { user, updateProfile } = useAuth();
+  const navigate = useNavigate();
   
   if (!user) return null;
+
+  // Redirect admin to admin panel
+  useEffect(() => {
+    if (user.role === 'admin') {
+      navigate('/admin');
+    }
+  }, [user.role, navigate]);
   
   // Patient State
   const [donors, setDonors] = useState([]);
