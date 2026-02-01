@@ -32,14 +32,17 @@ app.use(express.urlencoded({ extended: false }));
 
 // ✅ Middleware to ensure DB is connected
 app.use(async (req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} - Checking DB...`);
   try {
     await connectDB();
+    console.log(`[${new Date().toISOString()}] DB Connected for ${req.originalUrl}`);
     next();
   } catch (err) {
-    console.error("CRITICAL: Database connection failed!", err);
+    console.error(`[${new Date().toISOString()}] CRITICAL: DB connection failed for ${req.originalUrl}`, err);
     res.status(500).json({ 
       message: "Database connection failed", 
       error: err.message,
+      path: req.originalUrl,
       tip: "Check your MONGO_URI and Atlas IP Whitelist"
     });
   }
