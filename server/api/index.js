@@ -7,8 +7,7 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Connect DB
-connectDB().catch(err => console.error("Database connection failed:", err.message));
+
 
 // ✅ CORS config
 const allowedOrigins = ["https://donor-finder.netlify.app", "http://localhost:5173"];
@@ -31,6 +30,16 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// ✅ Middleware to ensure DB is connected
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ message: "Database connection failed", error: err.message });
+  }
+});
+
 // Routes
 const authRoutes = require("../routes/authRoutes");
 const userRoutes = require("../routes/userRoutes");
@@ -48,9 +57,10 @@ app.get("/", (req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  res.status(res.statusCode || 500).json({
-    message: err.message,
-    stack: process.env.NODE_ENV === "production" ? null : err.stack
+  console.error("Server Error:", err);
+  res.status(err.status || 500).json({
+    message: err.message || "Internal Server Error",
+    error: process.env.NODE_ENV === "production" ? {} : err
   });
 });
 
