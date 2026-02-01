@@ -40,14 +40,15 @@ const AdminDashboard = () => {
   };
 
   const deleteUser = async (id) => {
-      if(!window.confirm('Are you sure?')) return;
+      if(!window.confirm('Are you sure? This action is permanent!')) return;
       try {
-          // await api.delete(`/users/${id}`); // Need to implement DELETE endpoint in backend if desired
-          // For now just filtering UI for demo
-          toast.success('User deleted (Demo)');
-          setUsers(users.filter(u => u._id !== id));
+          await api.delete(`/users/${id}`);
+          toast.success('User removed successfully');
+          // Refetch both lists to keep UI in sync
+          fetchUsers();
+          fetchStats();
       } catch (error) {
-          toast.error('Failed to delete');
+          toast.error(error.response?.data?.message || 'Failed to delete user');
       }
   }
 
