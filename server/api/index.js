@@ -36,7 +36,12 @@ app.use(async (req, res, next) => {
     await connectDB();
     next();
   } catch (err) {
-    res.status(500).json({ message: "Database connection failed", error: err.message });
+    console.error("CRITICAL: Database connection failed!", err);
+    res.status(500).json({ 
+      message: "Database connection failed", 
+      error: err.message,
+      tip: "Check your MONGO_URI and Atlas IP Whitelist"
+    });
   }
 });
 
@@ -57,11 +62,19 @@ app.get("/", (req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error("Server Error:", err);
+  console.error("SERVER ERROR:", err);
   res.status(err.status || 500).json({
     message: err.message || "Internal Server Error",
     error: process.env.NODE_ENV === "production" ? {} : err
   });
 });
+
+// ✅ Local development listener
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server is running locally on http://localhost:${PORT} 🚀`);
+  });
+}
 
 module.exports = app;
