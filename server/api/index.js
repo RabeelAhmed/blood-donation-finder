@@ -30,6 +30,13 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// ✅ MONGO_URI sanity check
+if (process.env.MONGO_URI && !process.env.MONGO_URI.includes('.mongodb.net/')) {
+  console.warn("WARNING: MONGO_URI might be missing the database name or incorrectly formatted.");
+}
+const maskedURI = process.env.MONGO_URI ? process.env.MONGO_URI.replace(/\/\/.*@/, "//***:***@") : "UNDEFINED";
+console.log(`[${new Date().toISOString()}] Server initializing with URI: ${maskedURI}`);
+
 // ✅ Middleware to ensure DB is connected
 app.use(async (req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} - Checking DB...`);
