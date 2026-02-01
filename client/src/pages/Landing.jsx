@@ -15,10 +15,10 @@ const Landing = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white sm:text-5xl md:text-6xl"
+                  className="text-3xl tracking-tight font-extrabold text-gray-900 dark:text-white sm:text-5xl md:text-6xl"
                 >
                   <span className="block xl:inline">Donate Blood,</span>{' '}
-                  <span className="block text-primary-600 xl:inline">Save a Life</span>
+                  <span className="block text-primary-600 xl:inline mt-1 sm:mt-0">Save a Life</span>
                 </motion.h1>
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
@@ -52,7 +52,7 @@ const Landing = () => {
         </div>
         <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
           <img
-            className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full"
+            className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full lg:object-center shadow-lg sm:rounded-b-3xl lg:rounded-none"
             src="https://images.unsplash.com/photo-1615461173970-a590740920d5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
             alt="Blood Donation"
           />
@@ -69,52 +69,52 @@ const Landing = () => {
             </p>
           </div>
 
-          <div className="mt-10">
-            <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-              <div className="relative">
+          <div className="mt-12">
+            <dl className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-12 lg:grid-cols-4 lg:gap-x-12">
+              <div className="relative group">
                 <dt>
-                  <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 text-white">
+                  <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 group-hover:bg-primary-600 group-hover:text-white transition-all duration-300 shadow-sm mb-4">
                     <Search className="h-6 w-6" />
                   </div>
-                  <p className="ml-16 text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Find Donors Quickly</p>
+                  <p className="text-lg leading-6 font-bold text-gray-900 dark:text-gray-100">Find Donors Quickly</p>
                 </dt>
-                <dd className="mt-2 ml-16 text-base text-gray-500 dark:text-gray-400">
+                <dd className="mt-2 text-base text-gray-500 dark:text-gray-400 leading-relaxed">
                   Search by blood group and location to find available donors near you instantly.
                 </dd>
               </div>
 
-              <div className="relative">
+              <div className="relative group">
                 <dt>
-                  <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 text-white">
+                  <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 group-hover:bg-primary-600 group-hover:text-white transition-all duration-300 shadow-sm mb-4">
                     <Heart className="h-6 w-6" />
                   </div>
-                  <p className="ml-16 text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Register as a Donor</p>
+                  <p className="text-lg leading-6 font-bold text-gray-900 dark:text-gray-100">Register as a Donor</p>
                 </dt>
-                <dd className="mt-2 ml-16 text-base text-gray-500 dark:text-gray-400">
+                <dd className="mt-2 text-base text-gray-500 dark:text-gray-400 leading-relaxed">
                   Join our database of donors and be ready to help when someone is in need.
                 </dd>
               </div>
 
-              <div className="relative">
+              <div className="relative group">
                 <dt>
-                  <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 text-white">
+                  <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 group-hover:bg-primary-600 group-hover:text-white transition-all duration-300 shadow-sm mb-4">
                     <Activity className="h-6 w-6" />
                   </div>
-                  <p className="ml-16 text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Real-time Requests</p>
+                  <p className="text-lg leading-6 font-bold text-gray-900 dark:text-gray-100">Real-time Requests</p>
                 </dt>
-                <dd className="mt-2 ml-16 text-base text-gray-500 dark:text-gray-400">
+                <dd className="mt-2 text-base text-gray-500 dark:text-gray-400 leading-relaxed">
                   Send requests to donors and track their status in real-time.
                 </dd>
               </div>
 
-               <div className="relative">
+               <div className="relative group">
                 <dt>
-                  <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 text-white">
+                  <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 group-hover:bg-primary-600 group-hover:text-white transition-all duration-300 shadow-sm mb-4">
                     <Users className="h-6 w-6" />
                   </div>
-                  <p className="ml-16 text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Community Driven</p>
+                  <p className="text-lg leading-6 font-bold text-gray-900 dark:text-gray-100">Community Driven</p>
                 </dt>
-                <dd className="mt-2 ml-16 text-base text-gray-500 dark:text-gray-400">
+                <dd className="mt-2 text-base text-gray-500 dark:text-gray-400 leading-relaxed">
                   Build a community of heroes dedicated to saving lives.
                 </dd>
               </div>

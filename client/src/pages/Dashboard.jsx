@@ -141,10 +141,10 @@ const Dashboard = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
            Welcome, {user.name}
         </h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1">
             {user.role === 'patient' ? 'Find donors near you' : 'Manage your donation requests'}
         </p>
       </div>
@@ -159,11 +159,13 @@ const Dashboard = () => {
             </h2>
 
             <form onSubmit={handleSearch} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <CityAutocomplete 
-                      value={searchCity} 
-                      onChange={setSearchCity} 
-                  />
+              <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
+                  <div className="w-full">
+                    <CityAutocomplete 
+                        value={searchCity} 
+                        onChange={setSearchCity} 
+                    />
+                  </div>
                   <select
                     className="input-field bg-white dark:bg-gray-800"
                     value={searchGroup}
@@ -179,8 +181,8 @@ const Dashboard = () => {
                     <option value="O+">O+</option>
                     <option value="O-">O-</option>
                   </select>
-                  <button type="submit" className="btn-primary w-full">
-                    Search
+                  <button type="submit" className="btn-primary w-full shadow-lg">
+                    Search Donors
                   </button>
               </div>
               <div className="flex flex-wrap gap-4">
@@ -223,12 +225,12 @@ const Dashboard = () => {
           </div>
           
            {/* My Requests Status */}
-           <div className="card">
+           <div className="card overflow-hidden">
                <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4 flex items-center">
                    <Clock className="mr-2 h-5 w-5 text-blue-600" />
                    My Requests
                </h2>
-               <div className="overflow-x-auto">
+               <div className="overflow-x-auto -mx-6 px-6">
                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                        <thead className="bg-gray-50 dark:bg-gray-900">
                            <tr>
@@ -264,8 +266,8 @@ const Dashboard = () => {
 
       {user.role === 'donor' && (
         <div className="space-y-8">
-            {/* Availability Toggle */}
-            <div className="card flex items-center justify-between">
+             {/* Availability Toggle */}
+            <div className="card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-lg font-medium text-gray-900 dark:text-white">Donor Status</h2>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Turn off if you are not available to donate</p>
@@ -283,21 +285,21 @@ const Dashboard = () => {
             </div>
 
             {/* Donation History Section */}
-             <div className="card">
-                <div className="flex justify-between items-center mb-6">
-                    <div>
+             <div className="card overflow-hidden">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                    <div className="w-full sm:w-auto">
                         <h2 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
                             <Clock className="mr-2 h-5 w-5 text-primary-600" />
                             Donation History
                         </h2>
-                        <div className="flex space-x-4 mt-2">
-                             <div className="bg-primary-50 dark:bg-primary-900/20 px-3 py-1 rounded-md">
-                                 <p className="text-xs text-uppercase text-primary-600 dark:text-primary-400 font-semibold">Total Donations</p>
-                                 <p className="text-lg font-bold text-gray-900 dark:text-white">{donationHistory.length}</p>
+                        <div className="flex flex-wrap gap-3 mt-3">
+                             <div className="bg-primary-50 dark:bg-primary-900/20 px-3 py-1.5 rounded-md">
+                                 <p className="text-[10px] uppercase text-primary-600 dark:text-primary-400 font-bold tracking-wider">Total Donations</p>
+                                 <p className="text-xl font-bold text-gray-900 dark:text-white leading-tight">{donationHistory.length}</p>
                              </div>
-                             <div className={`px-3 py-1 rounded-md ${eligibility.eligible ? 'bg-green-50 dark:bg-green-900/20' : 'bg-orange-50 dark:bg-orange-900/20'}`}>
-                                 <p className={`text-xs text-uppercase font-semibold ${eligibility.eligible ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'}`}>Status</p>
-                                 <p className={`text-sm font-medium ${eligibility.eligible ? 'text-green-700 dark:text-green-300' : 'text-orange-700 dark:text-orange-300'}`}>{eligibility.eligible ? 'Eligible' : 'Waiting Period'}</p>
+                             <div className={`px-3 py-1.5 rounded-md ${eligibility.eligible ? 'bg-green-50 dark:bg-green-900/20' : 'bg-orange-50 dark:bg-orange-900/20'}`}>
+                                 <p className={`text-[10px] uppercase font-bold tracking-wider ${eligibility.eligible ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'}`}>Status</p>
+                                 <p className={`text-sm font-bold leading-tight ${eligibility.eligible ? 'text-green-700 dark:text-green-300' : 'text-orange-700 dark:text-orange-300'}`}>{eligibility.eligible ? 'Eligible' : 'Waiting Period'}</p>
                              </div>
                         </div>
                          <p className={`text-xs mt-2 ${eligibility.eligible ? 'text-green-600' : 'text-orange-500'}`}>
@@ -353,7 +355,7 @@ const Dashboard = () => {
                     </form>
                 )}
 
-                <div className="overflow-hidden">
+                 <div className="overflow-x-auto -mx-6 px-6">
                    {donationHistory.length > 0 ? (
                        <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                            {donationHistory.sort((a,b) => new Date(b.date) - new Date(a.date)).map((record, index) => (

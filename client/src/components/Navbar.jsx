@@ -65,20 +65,57 @@ const Navbar = () => {
       </div>
 
       {isOpen && (
-        <div className="sm:hidden">
-          <div className="pt-2 pb-3 space-y-1">
+        <div className="sm:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+          <div className="pt-2 pb-3 space-y-1 px-4">
+             <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800 mb-2">
+                <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Appearance</span>
+                <ThemeToggle />
+             </div>
              {user ? (
               <>
-                <Link to="/dashboard" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Dashboard</Link>
+                <Link 
+                  to="/dashboard" 
+                  onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                  Dashboard
+                </Link>
                  {user.role === 'admin' && (
-                    <Link to="/admin" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Admin</Link>
+                    <Link 
+                      to="/admin" 
+                      onClick={() => setIsOpen(false)}
+                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      Admin
+                    </Link>
                 )}
-                <button onClick={handleLogout} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Logout</button>
+                <div className="pt-4 pb-2 border-t border-gray-100 dark:border-gray-800">
+                    <p className="px-3 text-sm text-gray-500 dark:text-gray-400 mb-2">Logged in as {user.name}</p>
+                    <button 
+                      onClick={() => { handleLogout(); setIsOpen(false); }}
+                      className="flex w-full items-center px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    >
+                      <LogOut className="h-5 w-5 mr-3" />
+                      Logout
+                    </button>
+                </div>
               </>
              ) : (
                 <>
-                    <Link to="/login" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Login</Link>
-                    <Link to="/register" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Register</Link>
+                    <Link 
+                      to="/login" 
+                      onClick={() => setIsOpen(false)}
+                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      Login
+                    </Link>
+                    <Link 
+                      to="/register" 
+                      onClick={() => setIsOpen(false)}
+                      className="block px-3 py-2 rounded-md text-base font-medium text-white bg-primary-600 hover:bg-primary-700 transition-colors text-center mt-4"
+                    >
+                      Register
+                    </Link>
                 </>
              )}
           </div>
