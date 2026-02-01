@@ -11,11 +11,27 @@ const getStats = async (req, res) => {
     const activeRequests = await Request.countDocuments({ status: 'pending' });
     const successDonations = await Request.countDocuments({ status: 'accepted' });
 
+    // Blood Group Stats
+    const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+    const bloodGroupStats = {};
+    for (const group of bloodGroups) {
+      bloodGroupStats[group] = await User.countDocuments({ role: 'donor', bloodGroup: group });
+    }
+
+    // Recent Requests
+    const recentRequests = await Request.find()
+      .populate('patientId', 'name email')
+      .populate('donorId', 'name email')
+      .sort({ createdAt: -1 })
+      .limit(5);
+
     res.status(200).json({
       totalDonors,
       totalPatients,
       activeRequests,
-      successDonations
+      successDonations,
+      bloodGroupStats,
+      recentRequests
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
