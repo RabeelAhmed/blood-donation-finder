@@ -19,9 +19,12 @@ app.use(cors({
   credentials: true
 }));
 
-// ✅ Handle preflight
-app.options("/:any*", (req, res) => {
-  res.status(200).end();
+// ✅ Handle preflight (Using middleware to avoid Express 5 PathError)
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+  next();
 });
 
 // ✅ Body parser
