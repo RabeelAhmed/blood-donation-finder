@@ -185,9 +185,12 @@ const deleteUser = async (req, res) => {
         return res.status(403).json({ message: 'Cannot delete admin users' });
       }
       await User.deleteOne({ _id: req.params.id });
-      res.status(200).json({ message: 'User removed' });
+      res.status(200).json({ message: 'User permanently removed from system' });
     } else {
-      res.status(404).json({ message: 'User not found' });
+      res.status(404).json({ 
+        message: 'DATABASE ERROR: User not found with ID provided', 
+        attemptedId: req.params.id 
+      });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

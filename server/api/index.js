@@ -46,8 +46,8 @@ app.use(async (req, res, next) => {
     next();
   } catch (err) {
     console.error(`[${new Date().toISOString()}] CRITICAL: DB connection failed for ${req.originalUrl}`, err);
-    res.status(500).json({ 
-      message: "Database connection failed", 
+    res.status(500).json({
+      message: "Database connection failed",
       error: err.message,
       path: req.originalUrl,
       tip: "Check your MONGO_URI and Atlas IP Whitelist"
@@ -61,10 +61,17 @@ const userRoutes = require("../routes/userRoutes");
 const requestRoutes = require("../routes/requestRoutes");
 const adminRoutes = require("../routes/adminRoutes");
 
+// Mount routes at /api prefix for deployment
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/admin", adminRoutes);
+
+// Also mount at root level for backward compatibility
+app.use("/auth", authRoutes);
+app.use("/users", userRoutes);
+app.use("/requests", requestRoutes);
+app.use("/admin", adminRoutes);
 
 app.get("/", (req, res) => {
   res.send("Blood Donation Finder API is running 🚀");
