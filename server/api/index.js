@@ -9,10 +9,9 @@ const app = express();
 
 
 
-// ✅ CORS config
+// ✅ CORS config for Vercel deployment
 const allowedOrigins = [
-  "https://donor-finder.netlify.app", 
-  "https://blood-donation-finder-client.vercel.app", // Added Vercel frontend
+  "https://blood-donation-finder-uzmd.vercel.app", // Vercel frontend
   "http://localhost:5173"
 ];
 
@@ -28,7 +27,7 @@ app.use(cors({
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
+  credentials: false
 }));
 
 // ✅ Simple preflight handling
@@ -38,29 +37,10 @@ app.options('*', cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// ✅ MONGO_URI sanity check
-if (process.env.MONGO_URI && !process.env.MONGO_URI.includes('.mongodb.net/')) {
-  console.warn("WARNING: MONGO_URI might be missing the database name or incorrectly formatted.");
-}
-const maskedURI = process.env.MONGO_URI ? process.env.MONGO_URI.replace(/\/\/.*@/, "//***:***@") : "UNDEFINED";
-console.log(`[${new Date().toISOString()}] Server initializing with URI: ${maskedURI}`);
-
-// ✅ Middleware to ensure DB is connected
-app.use(async (req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} - Checking DB...`);
-  try {
-    await connectDB();
-    console.log(`[${new Date().toISOString()}] DB Connected for ${req.originalUrl}`);
-    next();
-  } catch (err) {
-    console.error(`[${new Date().toISOString()}] CRITICAL: DB connection failed for ${req.originalUrl}`, err);
-    res.status(500).json({
-      message: "Database connection failed",
-      error: err.message,
-      path: req.originalUrl,
-      tip: "Check your MONGO_URI and Atlas IP Whitelist"
-    });
-  }
+// ✅ Connect to database once at startup (fixes serverless timeout)
+connectDB().catch(err => {
+  console.error(`[${new Date().toISOString()}] CRITICAL: Initial DB connection failed:`, err.message);
+  console.error("Server will continue but database operations will fail.");
 });
 
 // Routes
