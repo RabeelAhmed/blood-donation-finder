@@ -1,24 +1,20 @@
 import axios from 'axios';
 
-// Ensure baseURL ends with /api/ for consistent joining
-let rawBaseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Get API URL from env or fallback to local
+const rawBaseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-// Resilience: If it's a vercel URL and missing /api, add it
-if (rawBaseURL.includes('vercel.app') && !rawBaseURL.includes('/api')) {
-    rawBaseURL = rawBaseURL.endsWith('/') ? `${rawBaseURL}api` : `${rawBaseURL}/api`;
-}
-
+// Create consistent baseURL: ensure it ends with /
 const baseURL = rawBaseURL.endsWith('/') ? rawBaseURL : `${rawBaseURL}/`;
 
 const api = axios.create({
   baseURL,
+  withCredentials: true, // Important for cookies/sessions if needed
 });
 
 // Add a request interceptor
 api.interceptors.request.use(
   (config) => {
-    // If the URL starts with a slash, it will ignore the baseURL's path.
-    // We strip it here to ensure it appends to /api/ correctly.
+    // Prevent double slashes when joining baseURL and config.url
     if (config.url && config.url.startsWith('/')) {
       config.url = config.url.substring(1);
     }

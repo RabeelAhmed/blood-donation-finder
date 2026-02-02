@@ -10,21 +10,29 @@ const app = express();
 
 
 // ✅ CORS config
-const allowedOrigins = ["https://donor-finder.netlify.app", "http://localhost:5173"];
+const allowedOrigins = [
+  "https://donor-finder.netlify.app", 
+  "https://blood-donation-finder-client.vercel.app", // Added Vercel frontend
+  "http://localhost:5173"
+];
+
 app.use(cors({
-  origin: allowedOrigins,
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
 
-// ✅ Handle preflight (Using middleware to avoid Express 5 PathError)
-app.use((req, res, next) => {
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-  next();
-});
+// ✅ Simple preflight handling
+app.options('*', cors());
 
 // ✅ Body parser
 app.use(express.json());
