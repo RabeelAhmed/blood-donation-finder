@@ -1,14 +1,14 @@
 import axios from 'axios';
 
-// Get API URL from env or fallback to Vercel backend
-const rawBaseURL = import.meta.env.VITE_API_URL || 'https://blood-donation-finder-2zp3.vercel.app/api';
+// Get API URL from env
+const rawBaseURL = import.meta.env.VITE_API_URL;
 
 // Create consistent baseURL: ensure it ends with /
 const baseURL = rawBaseURL.endsWith('/') ? rawBaseURL : `${rawBaseURL}/`;
 
 const api = axios.create({
   baseURL,
-  withCredentials: false, // Set to false for Vercel deployment
+  withCredentials: false, 
 });
 
 // Add a request interceptor

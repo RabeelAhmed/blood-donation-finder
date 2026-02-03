@@ -63,10 +63,17 @@ npm start
 cd ../client
 npm install
 ```
-Update server URL in `src/api/axios.js` if necessary.
-Start the dev server:
+
+#### Development
+The client is configured to automatically connect to the local backend at `http://localhost:5000` when running locally.
 ```bash
 npm run dev
+```
+
+#### Production
+For production builds, the client uses the Vercel URL configured in `.env`.
+```bash
+npm run build
 ```
 
 ## 📱 Screenshots (Conceptual)

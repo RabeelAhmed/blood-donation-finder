@@ -12,7 +12,8 @@ const app = express();
 // ✅ CORS config for Vercel deployment
 const allowedOrigins = [
   "https://blood-donation-finder-uzmd.vercel.app", // Vercel frontend
-  "http://localhost:5173"
+  "http://localhost:5173",
+  "http://localhost:5000"
 ];
 
 app.use(cors({
@@ -31,7 +32,7 @@ app.use(cors({
 }));
 
 // ✅ Simple preflight handling
-app.options('*', cors());
+app.options(/.*/, cors());
 
 // ✅ Body parser
 app.use(express.json());
