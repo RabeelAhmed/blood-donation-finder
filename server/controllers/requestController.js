@@ -8,6 +8,11 @@ const createRequest = async (req, res) => {
   try {
     const { donorId, bloodGroup, message } = req.body;
 
+    // Enforce that only patients can create requests
+    if (!req.user || req.user.role !== 'patient') {
+      return res.status(403).json({ message: 'Only patients can create blood requests' });
+    }
+
     const donor = await User.findById(donorId);
     if (!donor) {
       return res.status(404).json({ message: 'Donor not found' });
@@ -62,6 +67,10 @@ const updateRequestStatus = async (req, res) => {
 
     if (!request) {
       return res.status(404).json({ message: 'Request not found' });
+    }
+
+    if (!req.user || req.user.role !== 'donor') {
+      return res.status(403).json({ message: 'Only the donor can update the request status' });
     }
 
     if (request.donorId.toString() !== req.user.id) {

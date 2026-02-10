@@ -2,7 +2,7 @@ const User = require('../models/User');
 
 // @desc    Get all donors with filters
 // @route   GET /api/users/donors
-// @access  Public (or Private?)
+// @access  Public (optionally personalized when authenticated)
 const getDonors = async (req, res) => {
   try {
     const { bloodGroup, city, availability, isEligible } = req.query;
@@ -22,7 +22,8 @@ const getDonors = async (req, res) => {
     }
     
     if (city) {
-      query.city = { $regex: city, $options: 'i' }; // Case insensitive
+      // `city` is pre-sanitized by express-validator to escape regex characters.
+      query.city = { $regex: city, $options: 'i' }; // Case insensitive, safe pattern
     }
 
     if (isEligible === 'true') {
@@ -135,8 +136,10 @@ const addDonation = async (req, res) => {
         donationHistory: updatedUser.donationHistory,
         lastDonationDate: updatedUser.lastDonationDate
       });
+    } else if (!user) {
+      res.status(404).json({ message: 'User not found' });
     } else {
-      res.status(404).json({ message: 'User not found or not a donor' });
+      res.status(403).json({ message: 'Only donors can add donation records' });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -152,6 +155,10 @@ const toggleFavorite = async (req, res) => {
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.role !== 'patient') {
+      return res.status(403).json({ message: 'Only patients can manage favorite donors' });
     }
 
     if (user.favorites.includes(donorId)) {

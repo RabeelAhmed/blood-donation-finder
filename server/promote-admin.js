@@ -11,20 +11,26 @@ const promoteToAdmin = async (email) => {
       process.exit(1);
     }
 
+    if (!email || typeof email !== 'string') {
+      console.error('Usage: node promote-admin.js user@example.com');
+      process.exit(1);
+    }
+
     await mongoose.connect(process.env.MONGO_URI);
     console.log('Connected to MongoDB...');
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
-      console.error(`User with email ${email} not found.`);
+      console.error(`User with email ${normalizedEmail} not found.`);
       process.exit(1);
     }
 
     user.role = 'admin';
     await user.save();
 
-    console.log(`SUCCESS: User ${email} has been promoted to Admin!`);
+    console.log(`SUCCESS: User ${normalizedEmail} has been promoted to Admin!`);
     console.log('You can now log in and access the Admin Dashboard.');
     
     process.exit(0);
@@ -34,5 +40,5 @@ const promoteToAdmin = async (email) => {
   }
 };
 
-const targetEmail = 'rabeelsulehria3@gmail.com';
-promoteToAdmin(targetEmail);
+const [, , emailArg] = process.argv;
+promoteToAdmin(emailArg);
