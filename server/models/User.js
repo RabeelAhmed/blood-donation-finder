@@ -56,10 +56,26 @@ const userSchema = new mongoose.Schema({
   favorites: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
-  }]
+  }],
+  location: {
+    type: {
+      type: String,
+      enum: ['Point']
+    },
+    coordinates: {
+      type: [Number] // [longitude, latitude]
+    }
+  },
+  locationSharingEnabled: {
+    type: Boolean,
+    default: false
+  }
 }, {
   timestamps: true
 });
+
+// Create index for geospatial queries
+userSchema.index({ location: '2dsphere' });
 
 // Encrypt password using bcrypt
 userSchema.pre('save', async function() {

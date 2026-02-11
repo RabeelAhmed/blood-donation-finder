@@ -44,6 +44,8 @@ const registerUser = async (req, res) => {
         donationHistory: user.donationHistory,
         lastDonationDate: user.lastDonationDate,
         favorites: user.favorites,
+        location: user.location,
+        locationSharingEnabled: user.locationSharingEnabled,
         token: generateToken(user._id)
       });
     } else {
@@ -77,6 +79,8 @@ const loginUser = async (req, res) => {
         donationHistory: user.donationHistory,
         lastDonationDate: user.lastDonationDate,
         favorites: user.favorites,
+        location: user.location,
+        locationSharingEnabled: user.locationSharingEnabled,
         token: generateToken(user._id)
       });
     } else {

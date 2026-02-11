@@ -1,5 +1,7 @@
 const Request = require('../models/Request');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
+const { emitToUser } = require('../utils/socketManager');
 
 // @desc    Create a blood request
 // @route   POST /api/requests
@@ -27,6 +29,25 @@ const createRequest = async (req, res) => {
       donorId,
       bloodGroup,
       message,
+    });
+
+    // Create notification for donor
+    const notification = await Notification.create({
+      recipient: donorId,
+      sender: req.user.id,
+      type: 'request_sent',
+      message: `New blood donation request from ${req.user.name}`,
+      requestId: request._id
+    });
+
+    // Emit real-time notification to donor
+    emitToUser(donorId, 'new_notification', {
+      ...notification.toObject(),
+      sender: {
+        _id: req.user.id,
+        name: req.user.name,
+        bloodGroup: req.user.bloodGroup
+      }
     });
 
     res.status(201).json(request);
@@ -79,6 +100,33 @@ const updateRequestStatus = async (req, res) => {
 
     request.status = req.body.status || request.status;
     const updatedRequest = await request.save();
+
+    // Populate request to get patient details
+    await updatedRequest.populate('patientId', 'name');
+
+    // Create notification for patient
+    const notificationType = request.status === 'accepted' ? 'request_accepted' : 'request_rejected';
+    const notificationMessage = request.status === 'accepted' 
+      ? `${req.user.name} accepted your blood donation request`
+      : `${req.user.name} declined your blood donation request`;
+
+    const notification = await Notification.create({
+      recipient: request.patientId._id,
+      sender: req.user.id,
+      type: notificationType,
+      message: notificationMessage,
+      requestId: request._id
+    });
+
+    // Emit real-time notification to patient
+    emitToUser(request.patientId._id.toString(), 'new_notification', {
+      ...notification.toObject(),
+      sender: {
+        _id: req.user.id,
+        name: req.user.name,
+        bloodGroup: req.user.bloodGroup
+      }
+    });
 
     res.status(200).json(updatedRequest);
   } catch (error) {

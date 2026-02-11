@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { LogOut, User, Menu, X, Droplet } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import { useState } from 'react';
+import NotificationBell from './NotificationBell';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -29,6 +30,9 @@ const Navbar = () => {
             <ThemeToggle />
             {user ? (
               <>
+                <Link to="/find-donors" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+                  Find Donors
+                </Link>
                 <Link to="/dashboard" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
                   Dashboard
                 </Link>
@@ -37,6 +41,7 @@ const Navbar = () => {
                       Admin
                     </Link>
                 )}
+                <NotificationBell />
                 <div className="flex items-center space-x-2">
                     <span className="text-sm text-gray-500">Welcome, {user.name}</span>
                     <button onClick={handleLogout} className="p-2 rounded-full text-gray-500 hover:text-primary-600 hover:bg-gray-100">
@@ -73,6 +78,13 @@ const Navbar = () => {
              </div>
              {user ? (
               <>
+                <Link 
+                  to="/find-donors" 
+                  onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                  Find Donors
+                </Link>
                 <Link 
                   to="/dashboard" 
                   onClick={() => setIsOpen(false)}

@@ -53,15 +53,14 @@ const Dashboard = () => {
 
   const fetchDonors = async () => {
     try {
-      const { data } = await api.get(`/users/donors`, {
-          params: {
-              city: searchCity,
-              bloodGroup: searchGroup,
-              isEligible: onlyEligible || null,
-              availability: onlyAvailable ? 'true' : null,
-              favorites: showFavorites ? 'true' : null
-          }
-      });
+      const params = {};
+      if (searchCity) params.city = searchCity;
+      if (searchGroup) params.bloodGroup = searchGroup;
+      if (onlyEligible) params.isEligible = 'true';
+      if (onlyAvailable) params.availability = 'true';
+      if (showFavorites) params.favorites = 'true';
+
+      const { data } = await api.get(`/users/donors`, { params });
       if (Array.isArray(data)) {
         setDonors(data);
       } else {

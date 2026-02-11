@@ -1,11 +1,15 @@
 const express = require("express");
 const cors = require("cors");
+const http = require("http");
+const { Server } = require("socket.io");
 const rateLimit = require("express-rate-limit");
 const connectDB = require("../config/db");
 const config = require("../config/env");
 const logger = require("../utils/logger");
+const { initializeSocket } = require("../utils/socketManager");
 
 const app = express();
+const server = http.createServer(app);
 
 // ✅ CORS config for Vercel deployment
 const allowedOrigins = [
@@ -28,6 +32,18 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: false
 }));
+
+// ✅ Initialize Socket.IO with CORS
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: false
+  }
+});
+
+// Initialize socket manager
+initializeSocket(io);
 
 // ✅ Simple preflight handling
 app.options(/.*/, cors());
@@ -66,6 +82,7 @@ const authRoutes = require("../routes/authRoutes");
 const userRoutes = require("../routes/userRoutes");
 const requestRoutes = require("../routes/requestRoutes");
 const adminRoutes = require("../routes/adminRoutes");
+const notificationRoutes = require("../routes/notificationRoutes");
 
 // Mount routes at /api prefix for deployment
 app.use("/api/auth", authLimiter, authRoutes);
@@ -73,12 +90,14 @@ app.use("/api", apiLimiter);
 app.use("/api/users", userRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Also mount at root level for backward compatibility
 app.use("/auth", authLimiter, authRoutes);
 app.use("/users", userRoutes);
 app.use("/requests", requestRoutes);
 app.use("/admin", adminRoutes);
+app.use("/notifications", notificationRoutes);
 
 app.get("/", (req, res) => {
   res.send("Blood Donation Finder API is running 🚀");
@@ -122,7 +141,7 @@ app.use((err, req, res, next) => {
 
 // ✅ Local development listener
 if (config.NODE_ENV !== "production") {
-  app.listen(config.PORT, () => {
+  server.listen(config.PORT, () => {
     console.log(`Server is running locally on http://localhost:${config.PORT} 🚀`);
   });
 }

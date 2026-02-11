@@ -50,6 +50,47 @@ const getDonors = async (req, res) => {
   }
 };
 
+// @desc    Get donors within 10km radius
+// @route   GET /api/users/nearby
+// @access  Public
+const getNearbyDonors = async (req, res) => {
+  try {
+    const { latitude, longitude, bloodGroup } = req.query;
+
+    if (!latitude || !longitude) {
+      return res.status(400).json({ message: 'Please provide latitude and longitude' });
+    }
+
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+
+    let query = {
+      role: 'donor',
+      availability: true,
+      locationSharingEnabled: true, // Only show donors who have enabled location sharing
+      location: {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: [lng, lat]
+          },
+          $maxDistance: 10000 // 10km in meters
+        }
+      }
+    };
+
+    if (bloodGroup) {
+      query.bloodGroup = bloodGroup;
+    }
+
+    const donors = await User.find(query).select('-password');
+    res.status(200).json(donors);
+  } catch (error) {
+    console.error('Error fetching nearby donors:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Update user profile
 // @route   PUT /api/users/profile
 // @access  Private
@@ -204,11 +245,61 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// @desc    Update user location and sharing status
+// @route   PUT /api/users/location
+// @access  Private
+const updateLocation = async (req, res) => {
+  try {
+    const { latitude, longitude, enabled } = req.body;
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Only donors can update location
+    if (user.role !== 'donor') {
+      return res.status(403).json({ message: 'Only donors can share location' });
+    }
+
+    if (enabled) {
+      // Enable location sharing
+      if (!latitude || !longitude) {
+        return res.status(400).json({ message: 'Please provide latitude and longitude' });
+      }
+
+      user.location = {
+        type: 'Point',
+        coordinates: [parseFloat(longitude), parseFloat(latitude)]
+      };
+      user.locationSharingEnabled = true;
+    } else {
+      // Disable location sharing
+      user.locationSharingEnabled = false;
+      // Optionally clear coordinates when disabled
+      // user.location = { type: 'Point', coordinates: [] };
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      message: enabled ? 'Location sharing enabled' : 'Location sharing disabled',
+      locationSharingEnabled: user.locationSharingEnabled,
+      location: user.location
+    });
+  } catch (error) {
+    console.error('Error updating location:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getDonors,
+  getNearbyDonors,
   updateProfile,
   getAllUsers,
   addDonation,
   toggleFavorite,
-  deleteUser
+  deleteUser,
+  updateLocation
 };

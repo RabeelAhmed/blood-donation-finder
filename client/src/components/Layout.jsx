@@ -16,7 +16,6 @@ const Layout = () => {
           </p>
         </div>
       </footer>
-      <Toaster position="top-right" />
     </div>
   );
 };
